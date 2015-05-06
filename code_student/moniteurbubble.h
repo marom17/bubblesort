@@ -7,7 +7,7 @@
 class MoniteurBubble
 {
 private:
-    QMutex mutex;
+    QMutex mutex();
     QWaitCondition trieur;
     QWaitCondition principal;
     int nbMaxAttente;
@@ -23,21 +23,33 @@ public:
 
     ~MoniteurBubble();
 
-    bool attenteTrie(){
-        if(nbAttente < nbMaxAttente){
-            trieur.wait();
-        }else{
+    bool attentePrincipal(){
+        mutex.lock();
+        if(nbAttente >= nbMaxAttente){
             principal.wakeAll();
         }
+        trieur.wait(&mutex);
+        mutex.unlock();
         return estFini;
     }
 
-    void libereTrie(){
+    void attenteTrie(){
+        mutex.lock();
         if(nbAttente < nbMaxAttente){
-            principal.wait();
-        }else{
-            trie.wakeAll();
+            principal.wait(&mutex);
         }
+        mutex.unlock();
+    }
+
+    void libereTrie(bool fini){
+        mutex.lock();
+        estFini = fini;
+        trieur.wakeAll();
+        mutex.unlock();
+    }
+
+    void libereTrie(){
+        libereTrie(estFini);
     }
 };
 
