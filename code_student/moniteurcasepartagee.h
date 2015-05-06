@@ -23,7 +23,7 @@ public:
     void attenteCollegues(){
         mutex.lock();
         if(++nbAttente >= nbMaxAttente){
-            attente.wait();
+            attente.wait(&mutex);
         }else{
             attente.wakeAll();
         }

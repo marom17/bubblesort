@@ -23,16 +23,19 @@ private:
     int indexFin;
     T *tableau;
 
-    MoniteurBubble &moniteurControl;
-    MoniteurCasePartagee &moniteur1;
-    MoniteurCasePartagee &moniteur2;
+    MoniteurBubble *moniteurControl;
+    MoniteurCasePartagee *moniteurDebut;
+    MoniteurCasePartagee *moniteurFin;
 
     virtual void run() Q_DECL_OVERRIDE{
 
     }
 
 public:
-    BubbleSortThreaded(int indexDebut, int indexFin, T *tableau, MoniteurBubble &moniteurControl, MoniteurCasePartagee &moniteurCase1, MoniteurCasePartagee &moniteurCase2) {
+    BubbleSortThreaded(int indexDebut, int indexFin, T *tableau,
+                       MoniteurBubble*&moniteurControl,
+                       MoniteurCasePartagee *moniteurDebut,
+                       MoniteurCasePartagee *moniteurFin) {
         inactivite = false;
 
         this->indexDebut = indexDebut;
@@ -40,15 +43,22 @@ public:
 
         this->tableau = tableau;
 
-        this->moniteur1 = moniteur1;
-        this->moniteur2 = moniteur2;
+        this->moniteurDebut = moniteurDebut;
+        this->moniteurFin   = moniteurFin;
     }
 
 
 
-    virtual void sort(T a[], qint64 size)
-    {
-        qDebug() << " Doing nothing :-) ";
+    virtual void sort(T a[], qint64 size){
+        for (int c = size - 1 ; c > 0; --c){
+            for (int d = 0 ; d < c; ++d){
+                if (tableau[d] > tableau[d+1]){
+                    tableau[d]   = tableau[d] ^ tableau[d+1];
+                    tableau[d+1] = tableau[d] ^ tableau[d+1];
+                    tableau[d]   = tableau[d] ^ tableau[d+1];
+                }
+            }
+        }
     }
 
     bool getInactivite(){
