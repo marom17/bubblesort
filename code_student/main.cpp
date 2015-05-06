@@ -5,5 +5,5 @@
 int main(int argc, char *argv[])
 {
     SortTester tester;
-    tester.test();
+    tester.test(1,1);
 }
