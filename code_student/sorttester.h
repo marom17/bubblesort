@@ -6,7 +6,7 @@ class SortTester
 public:
     SortTester();
 
-    void test();
+    void test(int tabsize, int nbThread);
 };
 
 #endif // SORTTESTER_H
