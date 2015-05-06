@@ -3,19 +3,35 @@
 
 #include <isort.h>
 #include <QDebug>
+#include <QThread>
 
 template<typename T>
-class BubbleSortThreaded : public ISort<T>
+class BubbleSortThreaded : public ISort<T>, QThread
 {
 private:
+    bool inactivite;
+    int indexDebut;
+    int indexFin;
+    T tableau[];
 
 public:
 
-    BubbleSortThreaded() {}
+    BubbleSortThreaded(int indexDebut, int indexFin, T tableau[]) {
+        inactivite = false;
+
+        this->indexDebut = indexDebut;
+        this->indexFin = indexFin;
+
+        this->tableau = tableau;
+    }
 
     virtual void sort(T a[], qint64 size)
     {
         qDebug() << " Doing nothing :-) ";
+    }
+
+    bool getInactivite(){
+        return inactivite;
     }
 };
 
