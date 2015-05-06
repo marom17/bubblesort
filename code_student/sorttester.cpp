@@ -1,6 +1,7 @@
 #include "sorttester.h"
 
 #include <QCoreApplication>
+#include <time.h>
 #include <iostream>
 
 #include "bubblesort.h"
