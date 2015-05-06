@@ -29,14 +29,7 @@ void SortTester::test(int tabsize,int nbThread)
     //Création du tableau de thread
     QVector<BubbleSortThreaded<int>*> tabThread;
 
-    for(int i=0;i<nbThread;i++){
-        tabThread.push_back(new BubbleSortThreaded<int>());
-    }
 
-    //Démarrage threads
-    for(int i=0;i<nbThread;i++){
-        tabThread.at(i)->start();
-    }
 
     bool entier=false;
     int nbParThread = tabsize/nbThread;
@@ -49,10 +42,15 @@ void SortTester::test(int tabsize,int nbThread)
     //Disspatching
     int indexSuivant=0;
     for(int i=0;i<nbThread-1;i++){
-        tabThread.at(i)->sort((tab+indexSuivant),nbParThread);
+        tabThread.push_back(new BubbleSortThreaded<int>(indexSuivant,indexSuivant+nbParThread-1,tab));
         indexSuivant+=nbParThread;
     }
-    tabThread.last()->sort((tab+indexSuivant),nbParThread+1);
+    tabThread.push_back(new BubbleSortThreaded<int>(indexSuivant,indexSuivant+nbParThread,tab));
+
+    //Démarrage threads
+    for(int i=0;i<nbThread;i++){
+        tabThread[i]->start();
+    }
 
 
     /*
