@@ -12,11 +12,15 @@ private:
     bool inactivite;
     int indexDebut;
     int indexFin;
-    T tableau[];
+    T *tableau;
+
+    virtual void run() Q_DECL_OVERRIDE{
+
+    }
 
 public:
 
-    BubbleSortThreaded(int indexDebut, int indexFin, T tableau[]) {
+    BubbleSortThreaded(int indexDebut, int indexFin, T *tableau) {
         inactivite = false;
 
         this->indexDebut = indexDebut;
@@ -24,6 +28,8 @@ public:
 
         this->tableau = tableau;
     }
+
+
 
     virtual void sort(T a[], qint64 size)
     {
