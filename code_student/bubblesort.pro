@@ -23,4 +23,5 @@ HEADERS += \
     isort.h \
     bubblesortthreaded.h \
     sorttester.h \
-    moniteurbubble.h
+    moniteurbubble.h \
+    moniteurcasepartagee.h
