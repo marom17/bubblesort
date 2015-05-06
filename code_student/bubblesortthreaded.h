@@ -28,7 +28,27 @@ private:
     MoniteurCasePartagee *moniteurFin;
 
     virtual void run() Q_DECL_OVERRIDE{
+        while(moniteurControl->attenteVerification()){
+            // vérifie si ce n'est pas le premier thread
+            if(moniteurDebut != nullptr){
+                sort(tableau+indexDebut+1, indexFin-indexDebut);
+                // attend que son premier collegue finisse
+                moniteurDebut->attenteCollegues();
+                // si la case commune est plus grande que ça suivante, interchange
+                if(tableau[indexDebut] > tableau[indexDebut+1]){
+                    tableau[indexDebut]   = tableau[indexDebut] ^ tableau[indexDebut+1];
+                    tableau[indexDebut+1] = tableau[indexDebut] ^ tableau[indexDebut+1];
+                    tableau[indexDebut]   = tableau[indexDebut] ^ tableau[indexDebut+1];
+                }
+            }
+            else{
+                sort(tableau+indexDebut, indexFin-indexDebut);
+            }
 
+            if(moniteurFin != nullptr){
+                moniteurFin->attenteCollegues();
+            }
+        }
     }
 
 public:
