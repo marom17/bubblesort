@@ -52,7 +52,12 @@ public:
             indexSuivant+=nbParThread;
         }
         if(nbThread>1){
-            tabThread.push_back(new SortThread(indexSuivant-1,indexSuivant+nbParThread,tableau));
+            if(entier){
+                tabThread.push_back(new SortThread(indexSuivant-1,indexSuivant+nbParThread,tableau));
+            }
+            else{
+                tabThread.push_back(new SortThread(indexSuivant-1,indexSuivant+nbParThread-1,tableau));
+            }
         }
 
         //Démarrage threads
