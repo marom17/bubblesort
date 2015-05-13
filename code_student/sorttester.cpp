@@ -5,6 +5,7 @@
 #include <iostream>
 #include <QtMath>
 #include <QVector>
+#include <QThread>
 
 #include "bubblesort.h"
 #include "bubblesortthreaded.h"
@@ -13,6 +14,10 @@
 
 //#define TABSIZE 10000000
 #define TABSIZE 10
+
+MoniteurBubble *moniteurControl;
+MoniteurCasePartagee *moniteurDebut;
+MoniteurCasePartagee *moniteurFin;
 
 SortTester::SortTester()
 {
@@ -26,31 +31,12 @@ void SortTester::test(int tabsize,int nbThread)
     for(qint64 i=0;i<TABSIZE;i++)
         tab[i] = rand();
 
-    //Création du tableau de thread
-    QVector<BubbleSortThreaded<int>*> tabThread;
+    BubbleSortThreaded<int> *sorteur;
+    sorteur = new BubbleSortThreaded<int>(tabsize,nbThread,tab);
+    sorteur->sort(tab,tabsize);
 
 
 
-    bool entier=false;
-    int nbParThread = tabsize/nbThread;
-
-    //On test si il faut rajouter une case au dernier tableau
-    if(qCeil(tabsize/nbThread)==nbParThread){
-        entier=true;
-    }
-
-    //Disspatching
-    int indexSuivant=0;
-    for(int i=0;i<nbThread-1;i++){
-        tabThread.push_back(new BubbleSortThreaded<int>(indexSuivant,indexSuivant+nbParThread-1,tab));
-        indexSuivant+=nbParThread;
-    }
-    tabThread.push_back(new BubbleSortThreaded<int>(indexSuivant,indexSuivant+nbParThread,tab));
-
-    //Démarrage threads
-    for(int i=0;i<nbThread;i++){
-        tabThread[i]->start();
-    }
 
 
     /*
@@ -80,11 +66,11 @@ void SortTester::test(int tabsize,int nbThread)
 
     delete[] tab;
 
-    //Supression du tableau de thread
-    for(int i=0;i<nbThread;i++){
-        BubbleSortThreaded<int>* temp;
-        temp = tabThread.front();
-        tabThread.pop_front();
-        delete temp;
-    }
+//    //Supression du tableau de thread
+//    for(int i=0;i<nbThread;i++){
+//        BubbleSortThreaded<int>* temp;
+//        temp = tabThread.front();
+//        tabThread.pop_front();
+//        delete temp;
+//    }
 }

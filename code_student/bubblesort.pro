@@ -11,12 +11,14 @@ QT       -= gui
 TARGET = bubblesort
 CONFIG   += console
 CONFIG   -= app_bundle
+CONFIG += c++11
 
 TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    sorttester.cpp
+    sorttester.cpp \
+    sortthread.cpp
 
 HEADERS += \
     bubblesort.h \
@@ -24,4 +26,5 @@ HEADERS += \
     bubblesortthreaded.h \
     sorttester.h \
     moniteurbubble.h \
-    moniteurcasepartagee.h
+    moniteurcasepartagee.h \
+    sortthread.h
