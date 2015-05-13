@@ -46,11 +46,14 @@ public:
 
         //Disspatching
         int indexSuivant=0;
-        for(int i=0;i<nbThread-1;i++){
-            tabThread.push_back(new SortThread(indexSuivant,indexSuivant+nbParThread-1,tableau));
+        tabThread.push_back(new SortThread(indexSuivant,indexSuivant+nbParThread-1,tableau));
+        for(int i=1;i<nbThread-1;i++){
+            tabThread.push_back(new SortThread(indexSuivant-1,indexSuivant+nbParThread-1,tableau));
             indexSuivant+=nbParThread;
         }
-        tabThread.push_back(new SortThread(indexSuivant,indexSuivant+nbParThread,tableau));
+        if(nbThread>1){
+            tabThread.push_back(new SortThread(indexSuivant-1,indexSuivant+nbParThread,tableau));
+        }
 
         //Démarrage threads
         for(int i=0;i<nbThread;i++){
