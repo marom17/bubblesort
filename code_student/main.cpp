@@ -1,9 +1,16 @@
 
-
+#include "iostream"
 #include "sorttester.h"
+
+using namespace std;
 
 int main(int argc, char *argv[])
 {
+    int tabsize, nbThread;
+    cout << "Taille du tableau : ";
+    cin >> tabsize;
+    cout << "Nombre de thread  : ";
+    cin >> nbThread;
     SortTester tester;
-    tester.test(1,1);
+    tester.test(tabsize,nbThread);
 }
