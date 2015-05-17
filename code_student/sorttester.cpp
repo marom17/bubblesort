@@ -52,7 +52,7 @@ void SortTester::test(int tabsize,int nbThread)
     int initial = tab[0];
     bool error  = false;
 
-    for(qint64 i=0;i<TABSIZE;i++)
+    for(qint64 i=0;i<tabsize;i++)
     {
         if(initial > tab[i])
         {
