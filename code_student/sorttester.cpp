@@ -11,13 +11,10 @@
 #include "bubblesortthreaded.h"
 #include "time.h"
 
+using namespace std;
 
 //#define TABSIZE 10000000
 #define TABSIZE 10
-
-MoniteurBubble *moniteurControl;
-MoniteurCasePartagee *moniteurDebut;
-MoniteurCasePartagee *moniteurFin;
 
 SortTester::SortTester()
 {
@@ -26,14 +23,24 @@ void SortTester::test(int tabsize,int nbThread)
 {
     srand(time(0));
 
-    int *tab = new int[TABSIZE];
+    int *tab = new int[tabsize];
 
-    for(qint64 i=0;i<TABSIZE;i++)
+    for(qint64 i=0;i<tabsize;i++)
         tab[i] = rand();
+
+    cout << endl;
+    for(int i = 0; i < tabsize; i++)
+        cout << tab[i] << endl;
+    cout << endl;
 
     BubbleSortThreaded<int> *sorteur;
     sorteur = new BubbleSortThreaded<int>(nbThread);
     sorteur->sort(tab,tabsize);
+
+    cout << endl;
+    for(int i = 0; i < tabsize; i++)
+        cout << tab[i] << endl;
+    cout << endl;
 
     /*
     BubbleSort<int> sorter;

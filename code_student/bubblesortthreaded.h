@@ -4,6 +4,8 @@
 #include <isort.h>
 #include <QDebug>
 #include <QThread>
+#include <iostream>
+using namespace std;
 
 //#include "moniteurcasepartagee.h"
 #include "moniteurbubble.h"
@@ -24,6 +26,11 @@ public:
     }
 
     void sort(T tab[], qint64 size){
+        //évite de lancer trop de thread inutilement
+        if(size < nbThread){
+            nbThread = size;
+        }
+
         int nbParThread = size / nbThread;
         int inegalite = size % nbThread;
 

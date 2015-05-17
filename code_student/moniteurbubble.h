@@ -55,8 +55,9 @@ public:
     void libereTrie(bool fini){
         mutex->acquire();
         estFini = fini;
-        while(nbAttente-- > 0){
+        while(nbAttente > 0){
             attentePrincipal->release();
+            nbAttente--;
         }
         mutex->release();
     }

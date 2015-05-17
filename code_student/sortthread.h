@@ -3,9 +3,9 @@
 
 #include <QDebug>
 #include <QThread>
-
 #include <QSemaphore>
-#include "moniteurcasepartagee.h"
+
+//#include "moniteurcasepartagee.h"
 #include "moniteurbubble.h"
 
 template<typename T>
@@ -33,10 +33,11 @@ public:
                 // attend que son premier collegue finisse de trier
                 debut->acquire();
                 // si la case commune est plus grande que ca suivante, swap les valeurs
+                T tmp;
                 if(tableau[0] > tableau[1]){
-                    tableau[0] = tableau[0] ^ tableau[1];
-                    tableau[1] = tableau[0] ^ tableau[1];
-                    tableau[0] = tableau[0] ^ tableau[1];
+                    tmp = tableau[0];
+                    tableau[0]   = tableau[1];
+                    tableau[1] = tmp;
                     // indique qu'il y a eu un swap
                     inactivite = false;
                 }
@@ -47,7 +48,6 @@ public:
 
             // verifie si ce n'est pas le dernier thread
             if(fin != nullptr){
-                //libere le second collegue
                 fin->release();
             }
         }while(!moniteurControl->attenteVerification());
@@ -72,12 +72,13 @@ public:
         this->fin = fin;
     }
     void sort(T a[], qint64 size){
+        T tmp;
         for (int c = size - 1 ; c > 0; --c){
             for (int d = 0 ; d < c; ++d){
-                if (tableau[d] > tableau[d+1]){
-                    tableau[d]   = tableau[d] ^ tableau[d+1];
-                    tableau[d+1] = tableau[d] ^ tableau[d+1];
-                    tableau[d]   = tableau[d] ^ tableau[d+1];
+                if (a[d] > a[d+1]){
+                    tmp = a[d];
+                    a[d]   = a[d+1];
+                    a[d+1] = tmp;
                 }
             }
         }
