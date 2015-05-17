@@ -5,7 +5,7 @@
 #include <QDebug>
 #include <QThread>
 
-#include "moniteurcasepartagee.h"
+//#include "moniteurcasepartagee.h"
 #include "moniteurbubble.h"
 #include "sortthread.h"
 
@@ -14,55 +14,92 @@ class BubbleSortThreaded : public ISort<T>
 {
 
 private:
-    /*
-     * Ce serait pas mieux d'avoir un bool static
-     * que l'on met a vrai lorsque qu'il y eu un swap
-     * ainsi, on ne fait qu'une seule lecture au lieu
-     * de vérifier chaque thread
-     */
-    int tabsize;
     int nbThread;
-    T *tableau;
-    QVector<SortThread *> tabThread;
-
-
-
+    QVector<SortThread<T>* > tabThread;
+    QVector<QSemaphore* > tabSem;
 
 public:
-    BubbleSortThreaded(int tabsize,int nbThread, T *tableau) {
-        this->tableau=tableau;
-        this->tabsize=tabsize;
+    BubbleSortThreaded(int nbThread) {
         this->nbThread=nbThread;
     }
 
     void sort(T tab[], qint64 size){
-        bool entier=false;
-        int nbParThread = tabsize/nbThread;
+        int nbParThread = size / nbThread;
+        int inegalite = size % nbThread;
 
-        //On test si il faut rajouter une case au dernier tableau
-        if(qCeil(tabsize/nbThread)==nbParThread){
-            entier=true;
+        // crée une table de semaphore
+        tabThread.resize(nbThread);
+        tabSem.resize(nbThread-1);
+
+        for(int i = 0; i < nbThread-1; i++){
+            tabSem[i] = new QSemaphore(0);
         }
 
+        MoniteurBubble controleur(nbThread);
         //Disspatching
-        int indexSuivant=0;
-        tabThread.push_back(new SortThread(indexSuivant,indexSuivant+nbParThread-1,tableau));
-        for(int i=1;i<nbThread-1;i++){
-            tabThread.push_back(new SortThread(indexSuivant-1,indexSuivant+nbParThread-1,tableau));
-            indexSuivant+=nbParThread;
+        //debut
+        int indexSuivant = 0;
+        if(inegalite > 0){
+            tabThread[0] = new SortThread<T>(tab, nbParThread + 1, &controleur);
+            inegalite--;
+            indexSuivant += nbParThread + 1;
+        }else{
+            tabThread[0] = new SortThread<T>(tab, nbParThread, &controleur);
+            indexSuivant += nbParThread;
         }
-        if(nbThread>1){
-            if(entier){
-                tabThread.push_back(new SortThread(indexSuivant-1,indexSuivant+nbParThread,tableau));
+
+        //regarde s'il y a plus d'un thread
+        if(nbThread > 1){
+            tabThread[0]->setFin(tabSem[0]);
+        }
+        //milieu
+        for(int i = 1; i < nbThread-1; i++){
+            if(inegalite > 0){
+                tabThread[i] = new SortThread<T>(tab + indexSuivant - 1, nbParThread + 2, &controleur);
+                indexSuivant += nbParThread + 1;
+                inegalite--;
+            }else{
+                tabThread[i] = new SortThread<T>(tab + indexSuivant - 1, nbParThread + 1, &controleur);
+                indexSuivant += nbParThread;
             }
-            else{
-                tabThread.push_back(new SortThread(indexSuivant-1,indexSuivant+nbParThread-1,tableau));
-            }
+            tabThread[i]->setDebut(tabSem[i-1]);
+            tabThread[i]->setFin(tabSem[i]);
+        }
+        //fin
+        if(nbThread > 1){
+            tabThread[nbThread-1] = new SortThread<T>(tab + indexSuivant - 1, nbParThread + 1, &controleur);
+            tabThread[nbThread-1]->setDebut(tabSem[nbThread-2]);
         }
 
         //Démarrage threads
         for(int i=0;i<nbThread;i++){
             tabThread[i]->start(QThread::NormalPriority);
+        }
+
+        //Gestion des threads
+        bool fin;
+        do{
+            fin = true;
+            controleur.attenteFinTrie();
+            for(int i = 0; i < nbThread; i++){
+                if(!tabThread[i]->getInactivite()){
+                    fin = false;
+                }
+            }
+            controleur.libereTrie(fin);
+        }while(!fin);
+
+        // détruit les thread
+        tabSem.resize(nbThread-1);
+        for(int i = 0; i < nbThread; i++){
+            tabThread[i]->wait();
+            delete tabThread[i];
+        }
+
+        // détruit les semaphore
+        tabSem.resize(nbThread-1);
+        for(int i = 0; i < nbThread-1; i++){
+            delete tabSem[i];
         }
     }
 

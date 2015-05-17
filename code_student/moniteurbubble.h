@@ -1,15 +1,14 @@
 #ifndef MONITEURBUBBLE_H
 #define MONITEURBUBBLE_H
 
-#include <QMutex>
-#include <QWaitCondition>
+#include <QSemaphore>
 
 class MoniteurBubble
 {
 private:
-    QMutex mutex;
-    QWaitCondition attentePrincipal;
-    QWaitCondition attenteTrieurs;
+    QSemaphore *mutex;
+    QSemaphore *attentePrincipal;
+    QSemaphore *attenteTrieurs;
     int nbMaxAttente;
     int nbAttente;
     bool estFini;
@@ -18,34 +17,48 @@ public:
     MoniteurBubble(int nbMaxAttente){
         this->nbMaxAttente = nbMaxAttente;
         nbAttente = 0;
+        mutex = new QSemaphore(1);
+        attentePrincipal = new QSemaphore(0);
+        attenteTrieurs = new QSemaphore(0);
         estFini = false;
     }
 
-    ~MoniteurBubble();
+    ~MoniteurBubble(){
+        delete mutex;
+        delete attentePrincipal;
+        delete attenteTrieurs;
+    }
 
     bool attenteVerification(){
-        mutex.lock();
+        mutex->acquire();
         if(++nbAttente >= nbMaxAttente){
-            attenteTrieurs.wakeAll();
+            attenteTrieurs->release();
         }
-        attentePrincipal.wait(&mutex);
-        mutex.unlock();
-        return estFini;
+        mutex->release();
+        attentePrincipal->acquire();
+        mutex->acquire();
+        bool tmp = estFini;
+        mutex->release();
+        return tmp;
     }
 
     void attenteFinTrie(){
-        mutex.lock();
+        mutex->acquire();
         if(nbAttente < nbMaxAttente){
-            attenteTrieurs.wait(&mutex);
+            mutex->release();
+            attenteTrieurs->acquire();
+        }else{
+            mutex->release();
         }
-        mutex.unlock();
     }
 
     void libereTrie(bool fini){
-        mutex.lock();
+        mutex->acquire();
         estFini = fini;
-        attentePrincipal.wakeAll();
-        mutex.unlock();
+        while(nbAttente-- > 0){
+            attentePrincipal->release();
+        }
+        mutex->release();
     }
 
     void libereTrie(){

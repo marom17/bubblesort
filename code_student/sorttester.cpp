@@ -32,12 +32,8 @@ void SortTester::test(int tabsize,int nbThread)
         tab[i] = rand();
 
     BubbleSortThreaded<int> *sorteur;
-    sorteur = new BubbleSortThreaded<int>(tabsize,nbThread,tab);
+    sorteur = new BubbleSortThreaded<int>(nbThread);
     sorteur->sort(tab,tabsize);
-
-
-
-
 
     /*
     BubbleSort<int> sorter;
