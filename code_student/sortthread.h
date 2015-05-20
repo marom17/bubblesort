@@ -5,8 +5,12 @@
 #include <QThread>
 #include <QSemaphore>
 
+#include <iostream>
+using namespace std;
+
 //#include "moniteurcasepartagee.h"
 #include "moniteurbubble.h"
+#include "bubblesort.h"
 
 template<typename T>
 class SortThread : public QThread
@@ -15,6 +19,7 @@ private:
     bool inactivite; // indique s'il y a eu un swap avec une case partagee
     qint64 taille;
     T* tableau;
+    BubbleSort<T> sorter;
 
     QSemaphore *debut;
     QSemaphore *fin;
@@ -29,23 +34,22 @@ public:
             inactivite = true;
             // vérifie si ce n'est pas le premier thread
             if(debut != nullptr){
-                sort(tableau+1, taille);
+                sorter.sort(tableau+1, taille-1);
+
                 // attend que son premier collegue finisse de trier
                 debut->acquire();
                 // si la case commune est plus grande que ca suivante, swap les valeurs
-                T tmp;
                 if(tableau[0] > tableau[1]){
-                    tmp = tableau[0];
-                    tableau[0]   = tableau[1];
+                    T tmp = tableau[0];
+                    tableau[0] = tableau[1];
                     tableau[1] = tmp;
                     // indique qu'il y a eu un swap
+                    cout << "On en a pas fini\n";
                     inactivite = false;
                 }
+            }else{
+                sorter.sort(tableau, taille);
             }
-            else{
-                sort(tableau, taille);
-            }
-
             // verifie si ce n'est pas le dernier thread
             if(fin != nullptr){
                 fin->release();
@@ -53,9 +57,6 @@ public:
         }while(!moniteurControl->attenteVerification());
     }
     SortThread(T* tableau, qint64 taille, MoniteurBubble *moniteurControl){
-
-        inactivite = true;
-
         this->taille = taille;
 
         this->tableau = tableau;
@@ -65,23 +66,15 @@ public:
         this->fin   = nullptr;
 
     }
+
+    ~SortThread(){
+    }
+
     void setDebut(QSemaphore *debut){
         this->debut = debut;
     }
     void setFin(QSemaphore *fin){
         this->fin = fin;
-    }
-    void sort(T a[], qint64 size){
-        T tmp;
-        for (int c = size - 1 ; c > 0; --c){
-            for (int d = 0 ; d < c; ++d){
-                if (a[d] > a[d+1]){
-                    tmp = a[d];
-                    a[d]   = a[d+1];
-                    a[d+1] = tmp;
-                }
-            }
-        }
     }
 
     bool getInactivite(){

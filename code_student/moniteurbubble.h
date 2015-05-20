@@ -3,6 +3,9 @@
 
 #include <QSemaphore>
 
+#include <iostream>
+using namespace std;
+
 class MoniteurBubble
 {
 private:
@@ -13,6 +16,8 @@ private:
     int nbAttente;
     bool estFini;
 
+    bool test;
+
 public:
     MoniteurBubble(int nbMaxAttente){
         this->nbMaxAttente = nbMaxAttente;
@@ -21,6 +26,8 @@ public:
         attentePrincipal = new QSemaphore(0);
         attenteTrieurs = new QSemaphore(0);
         estFini = false;
+
+        test = false;
     }
 
     ~MoniteurBubble(){
@@ -32,6 +39,10 @@ public:
     bool attenteVerification(){
         mutex->acquire();
         if(++nbAttente >= nbMaxAttente){
+            if(test){
+                cout << "Gros probleme =============\n";
+            }
+            test = true;
             attenteTrieurs->release();
         }
         mutex->release();
@@ -43,13 +54,7 @@ public:
     }
 
     void attenteFinTrie(){
-        mutex->acquire();
-        if(nbAttente < nbMaxAttente){
-            mutex->release();
-            attenteTrieurs->acquire();
-        }else{
-            mutex->release();
-        }
+        attenteTrieurs->acquire();
     }
 
     void libereTrie(bool fini){
@@ -59,6 +64,13 @@ public:
             attentePrincipal->release();
             nbAttente--;
         }
+
+        if(nbAttente != 0){
+            cout  << "Probleme =====================\n";
+        }else{
+            test = false;
+        }
+
         mutex->release();
     }
 
