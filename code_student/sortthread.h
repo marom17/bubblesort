@@ -1,3 +1,7 @@
+/*
+ * Les semaphores debut et fin sont differentes.
+ * Un thread devra avoir un semaphore du voisin pour pouvoir le release
+ */
 #ifndef SORTTHREAD
 #define SORTTHREAD
 
@@ -30,12 +34,13 @@ private:
     }
 public:
     void threadSort(){
+        bool tmpFin ;
         do{
+            moniteurControl->affichageProteger("je bosse\n");
             inactivite = true;
             // vérifie si ce n'est pas le premier thread
             if(debut != nullptr){
                 sorter.sort(tableau+1, taille-1);
-
                 // attend que son premier collegue finisse de trier
                 debut->acquire();
                 // si la case commune est plus grande que ca suivante, swap les valeurs
@@ -54,7 +59,11 @@ public:
             if(fin != nullptr){
                 fin->release();
             }
-        }while(!moniteurControl->attenteVerification());
+            moniteurControl->affichageProteger("j'ai fini de bosser\n");
+            tmpFin = moniteurControl->attenteVerification();
+            if(!tmpFin)
+                moniteurControl->affichageProteger("C'est fini pour de bon\n");
+        }while(!tmpFin);
     }
     SortThread(T* tableau, qint64 taille, MoniteurBubble *moniteurControl){
         this->taille = taille;
@@ -78,6 +87,7 @@ public:
     }
 
     bool getInactivite(){
+        cout << inactivite << "\n";
         return inactivite;
     }
 };

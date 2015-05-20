@@ -111,26 +111,25 @@ public:
             controleur.attenteFinTrie();
             for(int i = 0; i < nbThread; i++){
                 if(!tabThread[i]->getInactivite()){
-                    cout << "C'est pas fini\n";
                     fin = false;
-                    break;
                 }
             }
             controleur.libereTrie(fin);
             cout << ++tmp <<"\n";
         }while(!fin);
+        controleur.affichageProteger("je sors\n");
 
         // détruit les thread
-        tabSem.resize(nbThread-1);
         for(int i = 0; i < nbThread; i++){
             tabThread[i]->wait();
-            delete tabThread[i];
+            SortThread<T>* tmp = tabThread[i];
+            delete tmp;
         }
 
         // détruit les semaphore
-        tabSem.resize(nbThread-1);
         for(int i = 0; i < nbThread-1; i++){
-            delete tabSem[i];
+            QSemaphore *tmp = tabSem[i];
+            delete tmp;
         }
     }
 

@@ -16,8 +16,6 @@ private:
     int nbAttente;
     bool estFini;
 
-    bool test;
-
 public:
     MoniteurBubble(int nbMaxAttente){
         this->nbMaxAttente = nbMaxAttente;
@@ -26,8 +24,6 @@ public:
         attentePrincipal = new QSemaphore(0);
         attenteTrieurs = new QSemaphore(0);
         estFini = false;
-
-        test = false;
     }
 
     ~MoniteurBubble(){
@@ -39,10 +35,6 @@ public:
     bool attenteVerification(){
         mutex->acquire();
         if(++nbAttente >= nbMaxAttente){
-            if(test){
-                cout << "Gros probleme =============\n";
-            }
-            test = true;
             attenteTrieurs->release();
         }
         mutex->release();
@@ -60,22 +52,18 @@ public:
     void libereTrie(bool fini){
         mutex->acquire();
         estFini = fini;
-        while(nbAttente > 0){
-            attentePrincipal->release();
-            nbAttente--;
-        }
 
-        if(nbAttente != 0){
-            cout  << "Probleme =====================\n";
-        }else{
-            test = false;
+        for(int i = 0; i < nbMaxAttente; i++){
+            attentePrincipal->release();
         }
 
         mutex->release();
     }
 
-    void libereTrie(){
-        libereTrie(estFini);
+    void affichageProteger(string msg){
+        mutex->acquire();
+        cout << msg;
+        mutex->release();
     }
 };
 
