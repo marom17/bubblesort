@@ -53,14 +53,13 @@ public:
                     inactivite = false;
                 }
             }else{
-                //moniteurControl->affichageProteger("je suis le premier\n");
                 sorter.sort(tableau, taille);
             }
             // verifie si ce n'est pas le dernier thread
             if(fin != nullptr){
                 fin->release();
             }
-            tmpFin = moniteurControl->attenteVerification(debut);
+            tmpFin = moniteurControl->attenteVerification();
         }while(!tmpFin);
     }
     SortThread(T* tableau, qint64 taille, MoniteurBubble *moniteurControl){

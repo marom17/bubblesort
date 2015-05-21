@@ -12,9 +12,10 @@ private:
     QSemaphore *mutex;
     QSemaphore *attentePrincipal;
     QSemaphore *attenteTrieurs;
+    QSemaphore *attenteLiberation;
     int nbMaxAttente;
     int nbAttente;
-    int fifo;
+    int nbAttenteFifo;
     bool estFini;
     bool estLiberer;
 
@@ -22,12 +23,13 @@ public:
     MoniteurBubble(int nbMaxAttente){
         this->nbMaxAttente = nbMaxAttente;
         nbAttente = 0;
+        nbAttenteFifo = 0;
         mutex = new QSemaphore(1);
         attentePrincipal = new QSemaphore(0);
         attenteTrieurs = new QSemaphore(0);
+        attenteLiberation = new QSemaphore(0);
         estFini = false;
         estLiberer = true;
-        fifo = 0;
     }
 
     ~MoniteurBubble(){
@@ -36,24 +38,34 @@ public:
         delete attenteTrieurs;
     }
 
-    bool attenteVerification(QSemaphore *lol){
-        while(!estLiberer);
+    bool attenteVerification(){
         mutex->acquire();
+        while(!estLiberer){
+            mutex->release();
+            nbAttenteFifo++;
+            attenteLiberation->acquire();
+        }
         if(++nbAttente == nbMaxAttente){
             attenteTrieurs->release();
         }
-        //cout << nbAttente << "\n";
-        mutex->release();
+        if(nbAttenteFifo > 0){
+            nbAttenteFifo--;
+            attenteLiberation->release();
+        }else{
+            mutex->release();
+        }
         attentePrincipal->acquire();
-        //cout << "\nliberer, delivrer\n\n";
         mutex->acquire();
-        //if(lol == nullptr)
-            //cout << "le premier est liberer avant l'heure\n";
         bool tmp = estFini;
         if(--nbAttente == 0){
             estLiberer = true;
         }
-        mutex->release();
+        if(nbAttenteFifo > 0){
+            nbAttenteFifo--;
+            attenteLiberation->release();
+        }else{
+            mutex->release();
+        }
         return tmp;
     }
 

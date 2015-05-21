@@ -28,19 +28,9 @@ void SortTester::test(int tabsize,int nbThread)
     for(qint64 i=0;i<tabsize;i++)
         tab[i] = rand();
 
-    cout << endl;
-    for(int i = 0; i < tabsize; i++)
-        cout << tab[i] << endl;
-    cout << "==============" <<endl;
-
     BubbleSortThreaded<int> *sorteur;
     sorteur = new BubbleSortThreaded<int>(nbThread);
     sorteur->sort(tab,tabsize);
-
-    cout << "==============" << endl;
-    for(int i = 0; i < tabsize; i++)
-        cout << tab[i] << endl;
-    cout << endl;
 
     /*
     BubbleSort<int> sorter;
