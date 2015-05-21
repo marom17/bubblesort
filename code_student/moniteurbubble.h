@@ -14,7 +14,9 @@ private:
     QSemaphore *attenteTrieurs;
     int nbMaxAttente;
     int nbAttente;
+    int fifo;
     bool estFini;
+    bool estLiberer;
 
 public:
     MoniteurBubble(int nbMaxAttente){
@@ -24,6 +26,8 @@ public:
         attentePrincipal = new QSemaphore(0);
         attenteTrieurs = new QSemaphore(0);
         estFini = false;
+        estLiberer = true;
+        fifo = 0;
     }
 
     ~MoniteurBubble(){
@@ -32,15 +36,23 @@ public:
         delete attenteTrieurs;
     }
 
-    bool attenteVerification(){
+    bool attenteVerification(QSemaphore *lol){
+        while(!estLiberer);
         mutex->acquire();
-        if(++nbAttente >= nbMaxAttente){
+        if(++nbAttente == nbMaxAttente){
             attenteTrieurs->release();
         }
+        //cout << nbAttente << "\n";
         mutex->release();
         attentePrincipal->acquire();
+        //cout << "\nliberer, delivrer\n\n";
         mutex->acquire();
+        //if(lol == nullptr)
+            //cout << "le premier est liberer avant l'heure\n";
         bool tmp = estFini;
+        if(--nbAttente == 0){
+            estLiberer = true;
+        }
         mutex->release();
         return tmp;
     }
@@ -52,17 +64,26 @@ public:
     void libereTrie(bool fini){
         mutex->acquire();
         estFini = fini;
-
-        for(int i = 0; i < nbMaxAttente; i++){
+        int i;
+        for(i = 0; i < nbMaxAttente; i++){
             attentePrincipal->release();
         }
-
+        estLiberer = false;
         mutex->release();
     }
 
     void affichageProteger(string msg){
         mutex->acquire();
         cout << msg;
+        mutex->release();
+    }
+
+    void affichageTabProteger(int *tab, int taille){
+        mutex->acquire();
+        for(int i = 0; i < taille; i++){
+            cout << tab[i] << " ";
+        }
+        cout << "\n";
         mutex->release();
     }
 };

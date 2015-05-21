@@ -3,31 +3,38 @@
 
 #include <QMutex>
 #include <QWaitCondition>
+#include <QSemaphore>
 
 class MoniteurCasePartagee
 {
 private:
-    QMutex mutex;
-    QWaitCondition attente;
-    int nbMaxAttente;
-    int nbAttente;
+    QSemaphore *mutex;
+    QSemaphore *attente;
+    bool estAttente;
 
 public:
-    MoniteurCasePartagee(int nbMaxAttente){
-        this->nbMaxAttente = nbMaxAttente;
-        nbAttente = 0;
+    MoniteurCasePartagee(){
+        mutex = new QSemaphore(1);
+        attente = new QSemaphore(0);
+        estAttente = false;
     }
 
-    ~MoniteurCasePartagee();
+    ~MoniteurCasePartagee(){
+        delete mutex;
+        delete attente;
+    }
 
     void attenteCollegues(){
-        mutex.lock();
-        if(++nbAttente >= nbMaxAttente){
-            attente.wait(&mutex);
+        mutex->acquire();
+        if(estAttente){
+            estAttente = false;
+            mutex->release();
+            attente->release();
         }else{
-            attente.wakeAll();
+            estAttente = true;
+            mutex->release();
+            attente->acquire();
         }
-        mutex.unlock();
     }
 };
 

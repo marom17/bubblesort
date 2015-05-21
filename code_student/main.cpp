@@ -10,10 +10,21 @@
 
  Solution:
  Nous somme partie que chaque thread avait une ou deux voisins (qu'il partage une ou
-deux case en commun). De ce fait, à la fin de son trie, le thread doit attendre que son
-voisin termine, pour pouvoir échanger la valeur sur la case commune avec la première
-de c'est valeurs. Pour pouvoir faire ceci, un thread va trie sa partie qui correspond de
-la second case s'il n'est pas premier jusqu'à la seconde case commune avec l'autre
+ deux case en commun). De ce fait, à la fin de son trie, le thread doit attendre que son
+ voisin termine, pour pouvoir échanger la valeur sur la case commune avec la première
+ de c'est valeurs. Pour pouvoir faire ceci, un thread va trie sa partie qui correspond de
+ la second case s'il n'est pas premier jusqu'à la seconde case commune qui est incluse.
+ Ensuite une fois tout ceci fait, on attend au rendez-vous centreal (MoniteurBubble)
+ que tout le monde se rejoigne. Après, le controleur de thread (BubbleSortThreaded)
+ regarde s'il n'y a pas eu de swap et si oui, il redemande au thread de refaire un
+ trie, sinon il demande à tout le monde de s'arrêter.
+
+ La repartition des cases dans le threads est très simple. On regarde d'abord si
+ le nombre de thread n'execede pas la taille du tableau, si oui, on dit que le nombre
+ de thread est égal à la taille. Ensuite, on divise la taille par le nombre de thread
+ pour avoir la taille de chaque tableau passer, on voit s'il y a des restes pour ajouter
+ un de plus au premiers.
+
 
  Remarque(s) :
  -----------------------------------------------------------------------------------

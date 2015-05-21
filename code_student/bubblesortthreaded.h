@@ -54,46 +54,25 @@ public:
             tabThread[0] = new SortThread<T>(tab, nbParThread, &controleur);
             indexSuivant += nbParThread;
         }
-
-
-        cout << endl;
-        for(int i = 0; i < indexSuivant; i++)
-            cout << tab[i] << endl;
-        cout << endl;
-
         //regarde s'il y a plus d'un thread
         if(nbThread > 1){
             tabThread[0]->setFin(tabSem[0]);
         }
         //milieu
         for(int i = 1; i < nbThread-1; i++){
-            T *tmp = tab + indexSuivant - 1;
-            cout <<  endl;
             if(inegalite > 0){
-                for(int i = 0; i < nbParThread + 2; i++)
-                    cout << tmp[i] << endl;
-
                 tabThread[i] = new SortThread<T>(tab + indexSuivant - 1, nbParThread + 2, &controleur);
                 indexSuivant += nbParThread + 1;
                 inegalite--;
             }else{
-                for(int i = 0; i < nbParThread + 1; i++)
-                    cout << tmp[i] << endl;
-
                 tabThread[i] = new SortThread<T>(tab + indexSuivant - 1, nbParThread + 1, &controleur);
                 indexSuivant += nbParThread;
             }
-            cout << endl;
             tabThread[i]->setDebut(tabSem[i-1]);
             tabThread[i]->setFin(tabSem[i]);
         }
         //fin
         if(nbThread > 1){
-            T *tmp = tab + indexSuivant - 1;
-            cout << endl;
-            for(int i = 0; i < nbParThread + 1; i++)
-                cout << tmp[i] << endl;
-            cout << endl;
             tabThread[nbThread-1] = new SortThread<T>(tab + indexSuivant - 1, nbParThread + 1, &controleur);
             tabThread[nbThread-1]->setDebut(tabSem.last());
         }
@@ -105,19 +84,17 @@ public:
 
         //Gestion des threads
         bool fin;
-        int tmp = 0;
         do{
             fin = true;
             controleur.attenteFinTrie();
             for(int i = 0; i < nbThread; i++){
                 if(!tabThread[i]->getInactivite()){
                     fin = false;
+                    break;
                 }
             }
             controleur.libereTrie(fin);
-            cout << ++tmp <<"\n";
         }while(!fin);
-        controleur.affichageProteger("je sors\n");
 
         // détruit les thread
         for(int i = 0; i < nbThread; i++){

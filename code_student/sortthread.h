@@ -20,6 +20,7 @@ template<typename T>
 class SortThread : public QThread
 {
 private:
+
     bool inactivite; // indique s'il y a eu un swap avec une case partagee
     qint64 taille;
     T* tableau;
@@ -33,10 +34,10 @@ private:
         threadSort();
     }
 public:
+    static bool test;
     void threadSort(){
         bool tmpFin ;
         do{
-            moniteurControl->affichageProteger("je bosse\n");
             inactivite = true;
             // vérifie si ce n'est pas le premier thread
             if(debut != nullptr){
@@ -49,20 +50,17 @@ public:
                     tableau[0] = tableau[1];
                     tableau[1] = tmp;
                     // indique qu'il y a eu un swap
-                    cout << "On en a pas fini\n";
                     inactivite = false;
                 }
             }else{
+                //moniteurControl->affichageProteger("je suis le premier\n");
                 sorter.sort(tableau, taille);
             }
             // verifie si ce n'est pas le dernier thread
             if(fin != nullptr){
                 fin->release();
             }
-            moniteurControl->affichageProteger("j'ai fini de bosser\n");
-            tmpFin = moniteurControl->attenteVerification();
-            if(!tmpFin)
-                moniteurControl->affichageProteger("C'est fini pour de bon\n");
+            tmpFin = moniteurControl->attenteVerification(debut);
         }while(!tmpFin);
     }
     SortThread(T* tableau, qint64 taille, MoniteurBubble *moniteurControl){
@@ -73,7 +71,6 @@ public:
         this->moniteurControl = moniteurControl;
         this->debut = nullptr;
         this->fin   = nullptr;
-
     }
 
     ~SortThread(){
@@ -87,7 +84,6 @@ public:
     }
 
     bool getInactivite(){
-        cout << inactivite << "\n";
         return inactivite;
     }
 };
