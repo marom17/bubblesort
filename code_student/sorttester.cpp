@@ -6,6 +6,7 @@
 #include <QtMath>
 #include <QVector>
 #include <QThread>
+#include <QTime>
 
 #include "bubblesort.h"
 #include "bubblesortthreaded.h"
@@ -28,9 +29,12 @@ void SortTester::test(int tabsize,int nbThread)
     for(qint64 i=0;i<tabsize;i++)
         tab[i] = rand();
 
+    QTime t;
     BubbleSortThreaded<int> *sorteur;
     sorteur = new BubbleSortThreaded<int>(nbThread);
+    t.start();
     sorteur->sort(tab,tabsize);
+    cout << "Temps ecoule " << t.elapsed() << " ms" << endl << endl;
 
     /*
     BubbleSort<int> sorter;
