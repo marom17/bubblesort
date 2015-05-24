@@ -22,7 +22,7 @@ SortTester::SortTester()
 }
 void SortTester::test(int tabsize,int nbThread)
 {
-    srand(time(0));
+    srand(0);
 
     int *tab = new int[tabsize];
 
@@ -62,12 +62,4 @@ void SortTester::test(int tabsize,int nbThread)
        std::cout << "Tri valide " << std::endl;
 
     delete[] tab;
-
-//    //Supression du tableau de thread
-//    for(int i=0;i<nbThread;i++){
-//        BubbleSortThreaded<int>* temp;
-//        temp = tabThread.front();
-//        tabThread.pop_front();
-//        delete temp;
-//    }
 }

@@ -25,6 +25,10 @@
  pour avoir la taille de chaque tableau passer, on voit s'il y a des restes pour ajouter
  un de plus au premiers.
 
+ On a pu remarquer qu'avec des threads, sa ne trier pas forcement plus rapidement
+ cela peut-être du au changement de contexte qui prennent quand même du temps à
+ s'executer.
+
 
  Remarque(s) :
  -----------------------------------------------------------------------------------
@@ -37,13 +41,20 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    while(1){
     int tabsize, nbThread;
-    cout << "Taille du tableau : ";
-    cin >> tabsize;
-    cout << "Nombre de thread  : ";
-    cin >> nbThread;
+    tabsize =3361;
+    nbThread = 2;
     SortTester tester;
-    tester.test(tabsize,nbThread);
+    for(int nb = nbThread; nb < 9; nb++){
+        cout << "Pour " << nbThread << " thread." << endl;
+        for(int i = 0; i < 10; i++){
+            tester.test(tabsize,nb);
+        }
+//        cout << "Taille du tableau : ";
+//        cin >> tabsize;
+//        cout << "Nombre de thread  : ";
+//        cin >> nbThread;
+//        SortTester tester;
+        cout << endl;
     }
 }

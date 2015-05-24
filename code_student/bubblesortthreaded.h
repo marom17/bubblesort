@@ -1,3 +1,17 @@
+/*
+ -----------------------------------------------------------------------------------
+ Fichier     : bubblesortthread.h
+ Auteur(s)   : Domingues Pedrosa João Miguel & Maillard Romain
+ Date        : 10.05.2015
+
+ But: Gere le bubble sort de manière concurentiel en créant tout les instances et
+ séparant le tableau avec la bonne taille, les lances, vérifie s'ils ont terminer
+ et les fait s'arrêter.
+
+ Remarque(s) :
+ -----------------------------------------------------------------------------------
+*/
+
 #ifndef BUBBLESORTTHREADED_H
 #define BUBBLESORTTHREADED_H
 
@@ -7,7 +21,6 @@
 #include <iostream>
 using namespace std;
 
-//#include "moniteurcasepartagee.h"
 #include "moniteurbubble.h"
 #include "sortthread.h"
 
@@ -38,6 +51,8 @@ public:
         tabThread.resize(nbThread);
         tabSem.resize(nbThread-1);
 
+        // crée tout les threads pour les rendez-vous
+        // entre chaque threads
         for(int i = 0; i < nbThread-1; i++){
             tabSem[i] = new QSemaphore(0);
         }
@@ -87,6 +102,7 @@ public:
         do{
             fin = true;
             controleur.attenteFinTrie();
+            // vérifie s'il n'y a plus de trie à faire
             for(int i = 0; i < nbThread; i++){
                 if(!tabThread[i]->getInactivite()){
                     fin = false;
@@ -109,9 +125,6 @@ public:
             delete tmp;
         }
     }
-
-
-
 
 };
 

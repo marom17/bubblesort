@@ -1,7 +1,17 @@
 /*
- * Les semaphores debut et fin sont differentes.
- * Un thread devra avoir un semaphore du voisin pour pouvoir le release
- */
+ -----------------------------------------------------------------------------------
+ Fichier     : sorththread.h
+ Auteur(s)   : Domingues Pedrosa João Miguel & Maillard Romain
+ Date        : 10.05.2015
+
+ But: Permet de faire un trie concurentiel du type bubble
+
+ Remarque(s) : les sémaphore début et fin corresponde au rendez-vous entre le voisin
+ de gauche et de droite, afin que celui qui est en charge du swap (celui de droite)
+ puisse faire sa vérification quand l'autre à fini de trier (celui de gauche).
+ -----------------------------------------------------------------------------------
+*/
+
 #ifndef SORTTHREAD
 #define SORTTHREAD
 
@@ -12,8 +22,8 @@
 #include <iostream>
 using namespace std;
 
-//#include "moniteurcasepartagee.h"
 #include "moniteurbubble.h"
+
 #include "bubblesort.h"
 
 template<typename T>
