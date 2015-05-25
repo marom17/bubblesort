@@ -25,10 +25,26 @@
  pour avoir la taille de chaque tableau passer, on voit s'il y a des restes pour ajouter
  un de plus au premiers.
 
- On a pu remarquer qu'avec des threads, sa ne trier pas forcement plus rapidement
- cela peut-être du au changement de contexte qui prennent quand même du temps à
- s'executer.
+ Voici les resultat en moyenne pour 10 test avec le même nombre de thread pour un
+ tableau de 3361 valeurs avec une graine random de 0:
 
+ 1 thread => 22 ms
+ 2 thread => 3680 ms
+ 3 thread => 2001 ms
+ 4 thread => 1394 ms
+ 5 thread => 1387.6 ms
+ 6 thread => 1109.5 ms
+ 7 thread => 1005.4 ms
+ 8 thread => 883.2 ms
+
+ On a pu remarquer qu'avec des threads, sa ne trier pas forcement plus rapidement
+ qu'avec un thread, cela peut-être du au fait que le changement de contexte prennent
+ un certain temps et qu'il ralentissent l'algorithme. On remarque que plus il y a
+ de thread plus on trie vite, on peut établir que comme la compléxité de l'algorithme
+ diminue avec le nombre de thread. Le bubblesort à une compléxite en O(n^2),
+ n correspondant à la taille du tableu mais si on divise la taille pour plusieurs
+ thread, la compléxité est départagé entre les différents thread et donc on a une
+ compléxité qui correspond à O((taille/nbThread)^2).
 
  Remarque(s) :
  -----------------------------------------------------------------------------------
@@ -39,22 +55,35 @@
 
 using namespace std;
 
-int main(int argc, char *argv[])
-{
-    int tabsize, nbThread;
-    tabsize =3361;
-    nbThread = 2;
+void bancTest(void){
+    int tabsize = 3361;
     SortTester tester;
-    for(int nb = nbThread; nb < 9; nb++){
-        cout << "Pour " << nbThread << " thread." << endl;
+    //permet de testet avec 3361 de 1 à 8 thread
+    for(int nb = 1; nb < 9; nb++){
+        cout << "Pour " << nb << " thread." << endl;
         for(int i = 0; i < 10; i++){
             tester.test(tabsize,nb);
         }
-//        cout << "Taille du tableau : ";
-//        cin >> tabsize;
-//        cout << "Nombre de thread  : ";
-//        cin >> nbThread;
-//        SortTester tester;
         cout << endl;
     }
+}
+
+int main(int argc, char *argv[])
+{
+    bancTest();
+    int tabsize, nbThread;
+    string reponse;
+    SortTester tester;
+    do{
+        cout << "Taille du tableau : ";
+        cin >> tabsize;
+        cout << "Nombre de thread  : ";
+        cin >> nbThread;
+        tester.test(tabsize,nbThread);
+        cout << endl;
+        do{
+            cout << "Voulez-vous continuer?[oui/non] :";
+            cin >> reponse;
+        }while(reponse != "oui" && reponse != "non");
+    }while(reponse == "oui");
 }
